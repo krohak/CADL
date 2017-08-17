@@ -9,7 +9,7 @@ import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
 # Create a directory
-#os.mkdir('ImagesFromTheInternet')
+os.mkdir('ImagesFromTheInternet')
 
 #http://www.image-net.org/api/text/imagenet.synset.geturls?wnid=n04128499
 
@@ -700,7 +700,7 @@ http://classicsailboat.image-sense.com/images/SiteImages/Site1/3536222006121_tn.
 http://static.flickr.com/197/491005853_ea8f9db951.jpg
 '''
 
-i=21
+i=0
 
 imgs=imgs.split('\n')
 print(imgs)
