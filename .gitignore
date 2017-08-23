@@ -3,3 +3,9 @@ __pycache__
 .pyc
 */img_align_celeba/
 session-1/ImagesFromTheInternet/
+session-2/*.png
+session-2/*.jpg
+session-3/MNIST_data
+session-3/gtzan_music_speech
+session-3/*.tar.gz
+session-3/vae*
