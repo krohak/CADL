@@ -9,3 +9,23 @@ session-3/MNIST_data
 session-3/gtzan_music_speech
 session-3/*.tar.gz
 session-3/vae*
+*/tests/libs
+session-4/inception
+session-4/kurosawa
+session-4/Untitled\ Folder
+session-4/[1-6]*.gif
+session-4/*.jpg
+session-4/*.tfmodel
+session-4/*.tgz
+session-4/*.zip
+session-4/montage.png
+session-4/style.png
+session-4/stylenet-bosch.gifs
+session-4/synset.txt
+session-4/*.json
+session-5/*.txt*
+session-5/*.tfmodel
+session-5/*.tgz
+session-5/*.zip
+session-5/*.jpg
+session-5/trump*

@@ -50,26 +50,27 @@ xs = (xs - np.mean(xs)) / np.std(xs)
 
 from tensorflow.python.framework import ops
 ops.reset_default_graph()
-X = tf.placeholder(tf.float32, shape=[None, 2], name='X')
-Y = tf.placeholder(tf.float32, shape=[None, 3], name='Y')
+with tf.device('/gpu:0'):
+    X = tf.placeholder(tf.float32, shape=[None, 2], name='X')
+    Y = tf.placeholder(tf.float32, shape=[None, 3], name='Y')
 
 
-n_neurons = [2, 64, 64, 64, 64, 64, 64, 3]
+    n_neurons = [2, 64, 64, 64, 64, 64, 64, 3]
 
-current_input = X
-for layer_i in range(1, len(n_neurons)):
-    current_input = linear(
-        X=current_input,
-        n_input=n_neurons[layer_i - 1],
-        n_output=n_neurons[layer_i],
-        activation=tf.nn.relu if (layer_i+1) < len(n_neurons) else None,
-        scope='layer_' + str(layer_i))
-Y_pred = current_input
-#[op.name for op in tf.get_default_graph().get_operations()]
+    current_input = X
+    for layer_i in range(1, len(n_neurons)):
+        current_input = linear(
+            X=current_input,
+            n_input=n_neurons[layer_i - 1],
+            n_output=n_neurons[layer_i],
+            activation=tf.nn.relu if (layer_i+1) < len(n_neurons) else None,
+            scope='layer_' + str(layer_i))
+    Y_pred = current_input
+    #[op.name for op in tf.get_default_graph().get_operations()]
 
 
-cost = tf.reduce_mean(tf.reduce_sum(distance(Y_pred, Y), 1))
-optimizer = tf.train.AdamOptimizer(0.001).minimize(cost)
+    cost = tf.reduce_mean(tf.reduce_sum(distance(Y_pred, Y), 1))
+    optimizer = tf.train.AdamOptimizer(0.001).minimize(cost)
 
 
 n_iterations = 1000
@@ -94,8 +95,9 @@ with tf.Session() as sess:
 
         if (it_i + 1) % 20 == 0:
             ys_pred = Y_pred.eval(feed_dict={X: xs}, session=sess)
-            fig, ax = plt.subplots(1, 1)
+            #fig, ax = plt.subplots(1, 1)
             img = np.clip(ys_pred.reshape(img.shape), 0, 255).astype(np.uint8)
-            plt.imshow(img)
+            #plt.imshow(img)
             #plt.show()
-            plt.savefig(('img_%s.png')%(it_i))
+            #plt.savefig(('img_%s.png')%(it_i))
+            plt.imsave(arr=img,fname=('img_%s.png'))%(it_i)

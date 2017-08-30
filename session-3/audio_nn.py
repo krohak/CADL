@@ -71,7 +71,7 @@ hop_size = 256
 re, im = dft.dft_np(s, hop_size=256, fft_size=512)
 mag, phs = dft.ztoc(re, im)
 print(mag.shape)
-plt.imshow(mag.T)
+#plt.imshow(mag.T)
 
 # The sample rate from our audio is 22050 Hz.
 sr = 22050
@@ -185,51 +185,52 @@ tf.reset_default_graph()
 # Create the input to the network.  This is a 4-dimensional tensor!
 # Don't forget that we should use None as a shape for the first dimension
 # Recall that we are using sliding windows of our magnitudes (TODO):
-X = tf.placeholder(name='X', shape=[None, 43, 256, 1], dtype=tf.float32)
+with tf.device('/gpu:0'):
+    X = tf.placeholder(name='X', shape=[None, 43, 256, 1], dtype=tf.float32)
 
-# Create the output to the network.  This is our one hot encoding of 2 possible values (TODO)!
-Y = tf.placeholder(name='Y', shape=[None,2], dtype=tf.float32)
-
-
-# TODO:  Explore different numbers of layers, and sizes of the network
-n_filters = [9, 9, 9, 9]
-
-# Now let's loop over our n_filters and create the deep convolutional neural network
-H = X
-for layer_i, n_filters_i in enumerate(n_filters):
-
-    # Let's use the helper function to create our connection to the next layer:
-    # TODO: explore changing the parameters here:
-    H, W = utils.conv2d(
-        H, n_filters_i, k_h=3, k_w=3, d_h=2, d_w=2,
-        name=str(layer_i))
-
-    # And use a nonlinearity
-    # TODO: explore changing the activation here:
-    H = tf.nn.relu(H)
-
-    # Just to check what's happening:
-    print(H.get_shape().as_list())
+    # Create the output to the network.  This is our one hot encoding of 2 possible values (TODO)!
+    Y = tf.placeholder(name='Y', shape=[None,2], dtype=tf.float32)
 
 
-# Connect the last convolutional layer to a fully connected network (TODO)!
-fc, W = utils.linear(H, n_output=100,name='W',activation=tf.nn.softmax)
+    # TODO:  Explore different numbers of layers, and sizes of the network
+    n_filters = [9, 9, 9, 9]
 
-# And another fully connected layer, now with just 2 outputs, the number of outputs that our
-# one hot encoding has (TODO)!
-Y_pred, W = utils.linear(fc, n_output=2,name='W2',activation=tf.nn.softmax)
+    # Now let's loop over our n_filters and create the deep convolutional neural network
+    H = X
+    for layer_i, n_filters_i in enumerate(n_filters):
+
+        # Let's use the helper function to create our connection to the next layer:
+        # TODO: explore changing the parameters here:
+        H, W = utils.conv2d(
+            H, n_filters_i, k_h=3, k_w=3, d_h=2, d_w=2,
+            name=str(layer_i))
+
+        # And use a nonlinearity
+        # TODO: explore changing the activation here:
+        H = tf.nn.relu(H)
+
+        # Just to check what's happening:
+        print(H.get_shape().as_list())
 
 
-loss = utils.binary_cross_entropy(Y_pred, Y)
-cost = tf.reduce_mean(tf.reduce_sum(loss, 1))
-predicted_y = tf.argmax(Y_pred, 1)
-actual_y = tf.argmax(Y, 1)
-correct_prediction = tf.equal(predicted_y, actual_y)
-accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+    # Connect the last convolutional layer to a fully connected network (TODO)!
+    fc, W = utils.linear(H, n_output=100,name='W',activation=tf.nn.softmax)
+
+    # And another fully connected layer, now with just 2 outputs, the number of outputs that our
+    # one hot encoding has (TODO)!
+    Y_pred, W = utils.linear(fc, n_output=2,name='W2',activation=tf.nn.softmax)
 
 
-learning_rate = 0.001
-optimizer = tf.train.AdamOptimizer(learning_rate).minimize(cost)
+    loss = utils.binary_cross_entropy(Y_pred, Y)
+    cost = tf.reduce_mean(tf.reduce_sum(loss, 1))
+    predicted_y = tf.argmax(Y_pred, 1)
+    actual_y = tf.argmax(Y, 1)
+    correct_prediction = tf.equal(predicted_y, actual_y)
+    accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+
+
+    learning_rate = 0.001
+    optimizer = tf.train.AdamOptimizer(learning_rate).minimize(cost)
 
 
 
